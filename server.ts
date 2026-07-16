@@ -141,16 +141,6 @@ app.get('/api/catalogo/:carrera', (req, res) => {
     }
 });
 
-
-// RASTREADOR DE RUTAS
-console.log("Rutas cargadas en memoria: /api/status, /api/guardar-malla, /api/extraer-oferta");
-
-// ENCENDEMOS EL MOTOR
-// ENCENDEMOS EL MOTOR
-app.listen(PUERTO, '0.0.0.0', () => {
-    console.log(`Servidor Backend ejecutandose en: http://localhost:${PUERTO}`);
-});
-
 // --- RUTA 5: SNIPER DE CUPOS EN VIVO (REAL) ---
 app.post('/api/verificar-cupos', async (req, res) => {
     // Ahora recibimos también el centro y la carrera para saber qué página buscar
@@ -169,7 +159,15 @@ app.post('/api/verificar-cupos', async (req, res) => {
         const urlSiiau = `http://consulta.siiau.udg.mx/wco/sspmacr.forma_listado?ciclopi=${ciclo}&cupi=${centro}&crsep=${carrera}&mostrarpi=1000`;
         
         // Hacemos la petición al SIIAU
-        const respuesta = await axios.get(urlSiiau);
+        // Cámbialo por esto bro:
+const respuesta = await axios.get(urlSiiau, {
+    headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'es-MX,es;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Connection': 'keep-alive'
+    }
+});
         const $ = cheerio.load(respuesta.data);
 
         // Recorremos la tabla gigante de materias
@@ -198,3 +196,14 @@ app.post('/api/verificar-cupos', async (req, res) => {
         res.status(500).json({ error: "Error consultando SIIAU" });
     }
 });
+
+
+// RASTREADOR DE RUTAS
+console.log("Rutas cargadas en memoria: /api/status, /api/guardar-malla, /api/extraer-oferta");
+
+// ENCENDEMOS EL MOTOR
+// ENCENDEMOS EL MOTOR
+app.listen(PUERTO, '0.0.0.0', () => {
+    console.log(`Servidor Backend ejecutandose en: http://localhost:${PUERTO}`);
+});
+
