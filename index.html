@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión Académica PRO - Multi Carrera</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@9/dist/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="app.js" defer></script>
+</head>
+<body>
+
+   <nav class="navbar" id="mainNav">
+        <button class="nav-btn mobile-hidden" onclick="cambiarPagina('form-page')"><span class="nav-text">Registro</span></button>
+        <button class="nav-btn mobile-hidden" onclick="cambiarPagina('list-page')"><span class="nav-text">Semestres</span></button>
+        
+        <button class="nav-btn" onclick="cambiarPagina('grid-page')" title="Malla Visual">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect></svg>
+            <span class="nav-text">Malla Visual</span>
+        </button>
+        <button class="nav-btn" onclick="cambiarPagina('horario-page')" title="Calendario">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <span class="nav-text">Calendario</span>
+        </button>
+        <button class="nav-btn" style="background: rgba(10, 132, 255, 0.15); color: #64D2FF; border: 1px solid rgba(10, 132, 255, 0.3);" onclick="cambiarPagina('generador-page')" title="Auto Generador">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            <span class="nav-text">Auto Generador</span>
+        </button>
+        <button class="nav-btn" onclick="cambiarPagina('dashboard-page')" title="Analítica">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 20V10M12 20V4M6 20v-6"></path></svg>
+            <span class="nav-text">Analítica</span>
+        </button>
+
+        <button class="nav-btn mobile-hidden" onclick="cambiarPagina('social-page')"><span class="nav-text">Servicio Social</span></button>
+        <button class="nav-btn mobile-hidden" onclick="cambiarPagina('practicas-page')"><span class="nav-text">Prácticas Prof.</span></button>
+        
+        <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="procesarArchivoCargado(event)">
+        
+        <div class="acciones-respaldo mobile-hidden">
+            <button class="btn-respaldo btn-cargar" onclick="document.getElementById('fileInput').click()">Cargar Respaldo</button>
+            <button class="btn-respaldo btn-descargar" onclick="descargarRespaldo()">Descargar</button>
+        </div>
+
+        <button class="hamburger-btn" onclick="toggleMobileMenu()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+    </nav>
+
+    <div class="container">
+        <div id="form-page" class="page active">
+            <div class="page-header">
+                <h2>Catálogo y Registro</h2>
+            </div>
+            
+            <div class="buscador-container">
+                <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px solid var(--glass-border);">
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="color: var(--accent-blue); font-weight: bold;">1. Selecciona tu Carrera</label>
+                        <select id="selectorCarrera" onchange="cambiarCatalogoCarrera()">
+                            <option value="INQU">Ingeniería Química (INQU)</option>
+                            <option value="INCO">Ingeniería en Computación (INCO)</option>
+                            <option value="ININ">Ingeniería Industrial (ININ)</option>
+                            <option value="CUSTOM">Otra / Personalizado (Pegar JSON)</option>
+                        </select>
+                    </div>
+                    <div style="flex: 2; min-width: 250px;">
+                        <label>2. Buscar Materia en el Catálogo</label>
+                        <input type="text" id="buscadorCatalogo" list="listaMaterias" placeholder="Escribe el nombre o clave..." oninput="seleccionarDelCatalogo(this.value)" style="margin-top: 0;">
+                        <datalist id="listaMaterias"></datalist>
+                    </div>
+                </div>
+
+                <details class="catalogo-section">
+                    <summary>Ver/Editar Datos del Catálogo Interno (JSON)</summary>
+                    <button class="btn-submit" style="margin-top: 10px; margin-bottom: 10px; background: rgba(48, 209, 88, 0.2) !important; color: #30D158 !important; border: 1px solid rgba(48, 209, 88, 0.4); width: 100%;" onclick="generarCatalogoDesdeOferta()">
+                        ✨ Auto-Construir Catálogo usando la Oferta Descargada (SIIAU)
+                    </button>
+                    <textarea id="jsonCatalogo" rows="10" onchange="cargarDatalist()"></textarea>
+                </details>
+            </div>
+
+            <h2 id="tituloFormulario">Registrar/Editar Materia</h2>
+            <div class="formulario">
+                <div><label>NRC (Clave)</label><input type="text" id="nrc" required></div>
+                <div><label>Nombre de la materia</label><input type="text" id="nombre" required></div>
+                <div><label>Semestre (Fila)</label><input type="number" id="semestre" required min="1"></div>
+                <div>
+                    <label>Ubicación (Columna)</label>
+                    <select id="letra">
+                        <option value="A">Columna A</option><option value="B">Columna B</option><option value="C">Columna C</option>
+                        <option value="D">Columna D</option><option value="E">Columna E</option><option value="F">Columna F</option>
+                        <option value="G">Columna G</option><option value="H">Columna H</option><option value="I">Columna I</option>
+                        <option value="J">Columna J</option><option value="K">Columna K</option><option value="L">Columna L</option>
+                        <option value="M">Columna M</option><option value="N">Columna N</option><option value="O">Columna O</option>
+                        <option value="P">Columna P</option><option value="Q">Columna Q</option><option value="R">Columna R</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Disponibilidad</label>
+                    <select id="apertura">
+                        <option value="ambos">Ambos Semestres</option>
+                        <option value="par">Solo Sem. Pares (2,4,6...)</option>
+                        <option value="impar">Solo Sem. Impares (1,3...)</option>
+                    </select>
+                </div>
+                <div><label>Créditos</label><input type="number" id="creditos" required min="0"></div>
+                <div>
+                    <label>Estado Actual</label>
+                    <select id="estado" onchange="gestionarEstado()">
+                        <option value="pendiente">Pendiente (Agendada)</option>
+                        <option value="cursando">Cursando Actualmente</option>
+                        <option value="aprobada">Aprobada</option>
+                        <option value="reprobada">Reprobada (Art. 33)</option>
+                        <option value="convalidada">Convalidada / Revalidada</option>
+                    </select>
+                </div>
+                <div><label>Calificación Final</label><input type="number" id="calificacion" placeholder="Opcional" min="0" max="100"></div>
+                <div><label>Prerrequisito</label><input type="text" id="prerequisito" placeholder="Ej. I5800"></div>
+                <div><label>Correquisito</label><input type="text" id="correquisito" placeholder="Ej. I5808"></div>
+                
+                <div style="grid-column: span 2;">
+                    <label>Módulo / Área</label>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 2px;">
+                        <select id="colorMateria" onchange="actualizarColorPreview()" style="flex: 1;">
+                            <option value="#58db33">MÓDULO 1: Fundamentos de Proc. Transf.</option>
+                            <option value="#b61bee">MÓDULO 2: Fenomenología de Proc. Transf.</option>
+                            <option value="#f5950f">MÓDULO 3: Proc. de Transformación Básicos</option>
+                            <option value="#a8a8a8">MÓDULO 4: Sistemas de Proc. Transf.</option>
+                            <option value="#0ff5f1">Optativa Abierta de Formación Integral</option>
+                            <option value="#0f17f5">Especializante Selectiva</option>
+                            <option value="#ff5c5c">Proyectos Modulares</option>
+                            <option value="#ff75d3">Optativa Abierta de Tecnología</option>
+                            <option value="#6b8e23">Requisito de Grado (SS / PP)</option>
+                        </select>
+                        <div id="colorPreview" style="width: 32px; height: 32px; border-radius: 50%; background-color: #58db33; border: 2px solid rgba(255,255,255,0.2); flex-shrink: 0; transition: 0.3s;"></div>
+                    </div>
+                </div>
+                
+                <div class="botones-form">
+                    <button id="btnSubmit" class="btn-submit" onclick="agregarMateria()">Guardar en el Sistema</button>
+                    <button id="btnCancelar" class="btn-submit" onclick="cancelarEdicion()" style="display: none;">Cancelar Edición</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="list-page" class="page">
+            <div class="page-header">
+                <h2>Materias por Semestre</h2>
+                <div id="indicadorCreditosListas" class="creditos-globales">Obtenidos: 0 / 418</div>
+            </div>
+            <div id="contenedorListas"></div>
+        </div>
+
+        <div id="grid-page" class="page">
+            <div class="page-header">
+                <h2>Malla Curricular Visual</h2>
+                <div class="header-actions">
+                    <div id="indicadorCreditosMalla" class="creditos-globales">Obtenidos: 0 / 418</div>
+                    <button onclick="exportarPDF()" class="btn-pdf" id="btnDescargaPdf">Descargar PDF</button>
+                </div>
+            </div>
+            <div id="contenedorMalla"></div>
+        </div>
+
+        <div id="horario-page" class="page">
+            <div class="page-header">
+                <h2>Armador de Horarios por Semestre</h2>
+            </div>
+            <div class="buscador-container">
+                <h3 style="margin-top: 0;">Descargar Oferta Académica (SIIAU en Vivo)</h3>
+                <p style="font-size:13px; color:var(--text-muted);">Conecta con el servidor backend para extraer los horarios más recientes en tiempo real.</p>
+                
+              <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+                    <!-- 1. Ciclo Totalmente Libre -->
+                    <input type="text" id="apiCiclo" value="202610" placeholder="Ciclo (Ej: 202610)" style="flex: 1; margin-top: 0;" title="Ingresa el ciclo. Ej: 202610 (Calendario A), 202620 (Calendario B)">
+                    
+                    <!-- 2. Todos los Centros Universitarios de la Red UdeG -->
+                    <select id="apiCentro" style="flex: 1; margin-top: 0;">
+                        <option value="D">CUCEI (D)</option>
+                        <option value="C">CUCEA (C)</option>
+                        <option value="E">CUCS (E)</option>
+                        <option value="A">CUAAD (A)</option>
+                        <option value="B">CUCBA (B)</option>
+                        <option value="F">CUCSH (F)</option>
+                        <option value="H">CUTONALÁ (H)</option>
+                        <option value="Q">UDGVirtual (Q)</option>
+                        <option value="I">CUALTOS (I)</option>
+                        <option value="J">CULAGOS (J)</option>
+                        <option value="K">CUSUR (K)</option>
+                        <option value="L">CUCIÉNEGA (L)</option>
+                        <option value="M">CUCOSTA (M)</option>
+                        <option value="N">CUNORTE (N)</option>
+                        <option value="O">CUVALLES (O)</option>
+                    </select>
+                    
+                    <!-- 3. Carrera Libre -->
+                    <input type="text" id="apiCarrera" value="" placeholder="Carrera (Ej: INCO, INQU)" style="flex: 1; margin-top: 0;">
+                    
+                    <button class="btn-submit" onclick="descargarOfertaAPI()" style="min-width: 120px;">Extraer del SIIAU</button>
+                </div>
+                
+                <div id="estadoOferta" style="font-size: 13px; margin-top: 12px; color: #30D158; font-weight: 600;"></div>
+            </div>
+
+            <div class="buscador-container">
+                <label>Agregar NRC al Horario</label>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <input type="text" id="nrcHorario" class="buscador-input" placeholder="Ej. 65187" style="margin-top:0;">
+                    <button class="btn-submit" onclick="agregarAlHorario()" style="max-width: 150px;">Agregar</button>
+                </div>
+            </div>
+
+            <div class="calendario-container" id="gridCalendario"></div>
+            <button class="btn-pdf" onclick="limpiarHorario()" style="margin-top: 15px; background: rgba(255, 69, 58, 0.2); color: #FF453A; border: 1px solid rgba(255, 69, 58, 0.4);">Borrar Horario Actual</button>
+        </div>
+
+        <div id="generador-page" class="page">
+            <div class="page-header">
+                <h2>Generador Automático de Horarios</h2>
+            </div>
+            <p style="font-size:14px; color:var(--text-muted); margin-bottom: 25px;">Selecciona las materias y tus reglas de tiempo. El sistema usará inteligencia recursiva para hallar combinaciones óptimas sin empalmes.</p>
+            
+            <div class="gen-layout">
+                <div class="gen-box">
+                    <h3 style="margin-top:0;">1. Selecciona tus Materias</h3>
+                    
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <select id="selSemestreGenerador" style="margin-top:0; flex:1; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.15); padding: 12px; border-radius: 10px;">
+                            <option value="">Cargar de Semestre...</option>
+                        </select>
+                        <button class="btn-submit" style="max-width: 100px; padding: 10px; background: rgba(48, 209, 88, 0.2) !important; color: #30D158 !important; border: 1px solid rgba(48, 209, 88, 0.4); box-shadow: none;" onclick="cargarSemestreGenerador()">Cargar</button>
+                    </div>
+                    
+                    <div style="border-top: 1px solid var(--glass-border); margin: 15px 0;"></div>
+                    
+                    <input type="text" id="buscadorGenerador" list="listaOferta" placeholder="Buscar materia o clave..." onchange="agregarCursoGenerador(this.value)">
+                    <datalist id="listaOferta"></datalist>
+                    <ul class="gen-list" id="listaCursosGenerador"></ul>
+                </div>
+
+                <div class="gen-box">
+                    <h3 style="margin-top:0;">2. Configura tu Tiempo y Profesores</h3>
+                    
+                    <div style="margin-bottom: 20px; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px;">
+                        <label style="color:#FF453A; font-weight:bold; font-size:13px;">Vetar Profesores (Opcional):</label>
+                        <div id="listaMaestrosVeto" style="max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; display:flex; flex-direction:column; gap:8px; margin-top:8px; border: 1px solid rgba(255,255,255,0.05);">
+                            <span style="font-size:11px; color:var(--text-muted);">Agrega materias primero para ver a los profesores...</span>
+                        </div>
+                    </div>
+
+                    <label style="display:flex; align-items:center; gap:10px; font-weight:500; margin-bottom:15px; cursor:pointer;">
+                        <input type="checkbox" id="chkTurnoUnico" checked onchange="toggleGeneradorUI()">
+                        <span style="font-size:14px;">Agendar todos los días en el mismo turno</span>
+                    </label>
+
+                    <div id="turnoFijoContainer">
+                        <label style="font-size:12px;">Turno Deseado:</label>
+                        <select id="selTurnoGlobal" style="margin-top:5px;">
+                            <option value="matutino">Matutino (07:00 a 14:55)</option>
+                            <option value="vespertino">Vespertino (14:00 a 20:55)</option>
+                            <option value="mixto">Mixto (Cualquier horario)</option>
+                        </select>
+                    </div>
+
+                    <div id="turnoDiasContainer" style="display:none;">
+                        <p style="font-size:12px; color:var(--text-muted); margin-top:0; margin-bottom:10px;">Elige tu entrada y salida, o marca la casilla para descansar.</p>
+                        <div id="panelDiasAvanzado" style="display:grid; gap:8px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--glass-border);">
+                        <label style="color:#30D158; font-weight:bold; font-size:13px;">Cupos en Vivo (SIIAU):</label>
+                        
+                        <label style="display:flex; align-items:center; gap:8px; margin-top:8px; cursor:pointer;">
+                            <input type="checkbox" id="chkCuposEnVivo" onchange="document.getElementById('cajaMinCupos').style.display = this.checked ? 'flex' : 'none';">
+                            <span style="font-size:12px;">Verificar cupos reales antes de generar</span>
+                        </label>
+
+                        <div id="cajaMinCupos" style="display:none; margin-top:10px; align-items:center; gap:10px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px;">
+                            <span style="font-size:11px; color: var(--text-muted);">¿Cuántos lugares necesitan tú y tus compas?</span>
+                            <input type="number" id="minCuposVal" value="1" min="1" style="width: 60px; padding: 4px; font-size: 12px; height: auto;">
+                        </div>
+                    </div>
+
+            <button id="btnEjecutarGen" class="btn-submit" onclick="ejecutarGenerador()" style="width:100%; margin-top:25px; padding: 16px; font-size:16px;">Generar Opciones</button>
+
+            <div id="resultadosGenerador" style="margin-top:35px; display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:25px;"></div>
+            <div id="contenedorCargarMas" style="text-align: center; margin-top: 20px; display: none;">
+                <button class="btn-submit" style="background: rgba(10, 132, 255, 0.2) !important; color: #64D2FF !important; border: 1px solid rgba(10, 132, 255, 0.4); max-width: 200px; display: inline-flex; justify-content: center;" onclick="mostrarMasResultados()">Cargar más opciones</button>
+            </div>
+        </div>
+            
+
+        <div id="dashboard-page" class="page">
+            <div class="page-header">
+                <h2>Dashboard y Analítica</h2>
+            </div>
+            
+            <div class="dashboard-grid">
+                <div class="dash-card">
+                    <h3>Semestres Proyectados</h3>
+                    <div class="valor" id="dash-semestres">0</div>
+                    <p style="font-size: 12px; color:var(--text-muted);">Tu fecha de graduación depende de esto.</p>
+                </div>
+                <div class="dash-card">
+                    <h3>Créditos Aprobados</h3>
+                    <div class="valor" id="dash-creditos">0 / 418</div>
+                </div>
+                <div class="dash-card">
+                    <h3>Eficiencia Académica</h3>
+                    <div class="valor" id="dash-eficiencia">0%</div>
+                    <p style="font-size: 12px; color:var(--text-muted);">Materias aprobadas vs. cursadas.</p>
+                </div>
+            </div>
+
+            <details class="semestre-block" open>
+                <summary class="semestre-summary" style="color: #FF9F0A !important;">
+                    Camino Crítico (Cuellos de Botella)
+                </summary>
+                <div style="padding: 15px;">
+                    <p style="font-size: 13px; margin-top: 0; color:var(--text-muted);">Estas materias desbloquean más cursos. No las repruebes.</p>
+                    <ul class="lista-cuellos" id="listaCuellosBotella"></ul>
+                </div>
+            </details>
+
+            <details class="semestre-block" open>
+                <summary class="semestre-summary" style="color: #30D158 !important;">
+                    Grafos de Dependencias Visuales
+                </summary>
+                <div style="padding: 15px;" id="grafoMermaidContainer">
+                    <p style="color:var(--text-muted); margin-top:10px;">Añade materias con prerrequisitos para visualizar los grafos separados.</p>
+                </div>
+            </details>
+        </div>
+
+        <div id="social-page" class="page">
+            <div class="page-header"><h2>Servicio Social</h2></div>
+            <div id="contenidoSocial"></div>
+        </div>
+
+        <div id="practicas-page" class="page">
+            <div class="page-header"><h2>Prácticas Profesionales</h2></div>
+            <div id="contenidoPracticas"></div>
+        </div>
+    </div>
+
+    <div class="sync-panel" style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin: 10px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+            <span style="font-size: 12px; font-weight: bold; color: var(--text-muted);">NUBE MONGODB</span>
+            <div id="statusLed" title="Desconectado" style="width: 10px; height: 10px; background: #FF453A; border-radius: 50%; box-shadow: 0 0 5px #FF453A;"></div>
+        </div>
+        
+        <button class="btn-submit" onclick="respaldarEnNube()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; background: #007AFF;">
+            <span class="icon">☁️</span> Respaldar Progreso
+        </button>
+        
+        <p id="lastSync" style="font-size: 10px; color: var(--text-muted); margin-top: 8px; text-align: center;">Sin respaldos recientes</p>
+    </div>
+
+</body>
+</html>
