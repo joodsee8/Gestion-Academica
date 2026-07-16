@@ -570,7 +570,7 @@ async function descargarOfertaAPI() {
     estado.style.color = "#FF9F0A"; estado.innerText = "Conectando al servidor y extrayendo datos del SIIAU... ⏳";
 
     try {
-        const respuesta = await fetch('http://localhost:3000/api/extraer-oferta', {
+        const respuesta = await fetch('https://generador-horarios-cucei.onrender.com/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ciclo, centro, carrera })
