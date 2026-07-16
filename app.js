@@ -98,7 +98,7 @@ async function cambiarCatalogoCarrera() {
         cargarDatalist();
     } else {
         try {
-            const respuesta = await fetch(`http://localhost:3000/api/catalogo/${carrera}`);
+            const respuesta = await fetch(`https://generador-horarios-cucei.onrender.com/api/catalogo/${carrera}`);
             if (!respuesta.ok) throw new Error("Catálogo no encontrado");
             const datosJson = await respuesta.json();
             txtArea.value = JSON.stringify(datosJson, null, 2);
@@ -570,7 +570,7 @@ async function descargarOfertaAPI() {
     estado.style.color = "#FF9F0A"; estado.innerText = "Conectando al servidor y extrayendo datos del SIIAU... ⏳";
 
     try {
-        const respuesta = await fetch('https://generador-horarios-cucei.onrender.com/', {
+        const respuesta = await fetch('https://generador-horarios-cucei.onrender.com/api/extraer-oferta', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ciclo, centro, carrera })
@@ -920,7 +920,7 @@ async function ejecutarGenerador() {
         let nrcsAProbar = gruposMaterias.flat(); 
 
         try {
-            const resCupos = await fetch('http://localhost:3000/api/verificar-cupos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nrcs: nrcsAProbar, ciclo: cicloActual, centro: centroActual, carrera: carreraActual }) });
+            const resCupos = await fetch('https://generador-horarios-cucei.onrender.com/api/verificar-cupos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nrcs: nrcsAProbar, ciclo: cicloActual, centro: centroActual, carrera: carreraActual }) });
             if(!resCupos.ok) throw new Error("Error en backend");
             const dictCupos = await resCupos.json();
 
@@ -1184,7 +1184,7 @@ function renderizarDashboard() {
 async function checkBackendStatus() {
     const led = document.getElementById('statusLed');
     try {
-        const res = await fetch('http://localhost:3000/api/status');
+        const res = await fetch('https://generador-horarios-cucei.onrender.com/api/status');
         if (!res.ok) throw new Error();
         led.style.background = "#30D158"; led.style.boxShadow = "0 0 8px #30D158"; led.title = "Servidor en línea";
     } catch (e) {
@@ -1198,7 +1198,7 @@ async function respaldarEnNube() {
     btn.disabled = true; btn.style.opacity = "0.7"; btn.innerHTML = "<span>⏳</span> Sincronizando...";
 
     try {
-        const respuesta = await fetch('http://localhost:3000/api/guardar-malla', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ malla: materias }) });
+        const respuesta = await fetch('https://generador-horarios-cucei.onrender.com/api/guardar-malla', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ malla: materias }) });
         if (!respuesta.ok) throw new Error();
 
         btn.style.background = "#30D158"; btn.innerHTML = "<span>✅</span> ¡Hecho!";
