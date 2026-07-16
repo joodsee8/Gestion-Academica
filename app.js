@@ -588,6 +588,25 @@ async function descargarOfertaAPI() {
     }
 }
 
+function cargarDatalistOferta() {
+    const dataList = document.getElementById('listaOferta'); 
+    if(!dataList) return; // Por si el HTML no tiene el datalist aún
+    
+    dataList.innerHTML = ''; // Limpiamos la lista anterior
+    
+    // Si la oferta está vacía, no hacemos nada
+    if (Object.keys(ofertaAcademica).length === 0) return;
+
+    // Recorremos todas las materias de la oferta y las metemos al datalist
+    for (let nrc in ofertaAcademica) {
+        let curso = ofertaAcademica[nrc];
+        let option = document.createElement('option');
+        // Esto mostrará "INQU123 - Matemáticas" en la lista desplegable
+        option.value = `${curso.clave} - ${curso.materia}`; 
+        dataList.appendChild(option);
+    }
+}
+
 function convertirHoraAMinutos(horaStr) {
     if(!horaStr.includes(':')) {
         if(horaStr.length === 4) { horaStr = horaStr.substring(0,2) + ':' + horaStr.substring(2); } 
