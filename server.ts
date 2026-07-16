@@ -11,7 +11,7 @@ const app = express();
 const PUERTO = 3000;
 
 // Permisos abiertos para que el navegador no llore
-app.use(cors({ origin: '*' }));
+app.use(cors());
 app.use(express.json());
 
 // Conexión a Base de Datos
