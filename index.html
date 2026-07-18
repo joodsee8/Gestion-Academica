@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión Académica PRO - Multi Carrera</title>
+    <title>Horario QCI</title>
     
     <script src="https://cdn.jsdelivr.net/npm/mermaid@9/dist/mermaid.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -30,14 +30,14 @@
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
             <span class="nav-text">Auto Generador</span>
         </button>
-        <button class="nav-btn" onclick="cambiarPagina('dashboard-page')" title="Analítica">
+        <!--<button class="nav-btn" onclick="cambiarPagina('dashboard-page')" title="Analítica">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 20V10M12 20V4M6 20v-6"></path></svg>
             <span class="nav-text">Analítica</span>
         </button>
 
         <button class="nav-btn mobile-hidden" onclick="cambiarPagina('social-page')"><span class="nav-text">Servicio Social</span></button>
         <button class="nav-btn mobile-hidden" onclick="cambiarPagina('practicas-page')"><span class="nav-text">Prácticas Prof.</span></button>
-        
+    -->
         <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="procesarArchivoCargado(event)">
         
         <div class="acciones-respaldo mobile-hidden">
@@ -63,7 +63,7 @@
                         <select id="selectorCarrera" onchange="cambiarCatalogoCarrera()">
                             <option value="INQU">Ingeniería Química (INQU)</option>
                             <option value="INCO">Ingeniería en Computación (INCO)</option>
-                            <option value="ININ">Ingeniería Industrial (ININ)</option>
+                            <option value="INDU">Ingeniería Industrial (INDU)</option>
                             <option value="CUSTOM">Otra / Personalizado (Pegar JSON)</option>
                         </select>
                     </div>
@@ -171,15 +171,15 @@
                 <h2>Armador de Horarios por Semestre</h2>
             </div>
             <div class="buscador-container">
-                <h3 style="margin-top: 0;">Descargar Oferta Académica (SIIAU en Vivo)</h3>
+                <h3 style="margin-top: 0;">Descargar Oferta Académica</h3>
                 <p style="font-size:13px; color:var(--text-muted);">Conecta con el servidor backend para extraer los horarios más recientes en tiempo real.</p>
                 
-              <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+              <div class="formulario-dinamico">
                     <!-- 1. Ciclo Totalmente Libre -->
-                    <input type="text" id="apiCiclo" value="202610" placeholder="Ciclo (Ej: 202610)" style="flex: 1; margin-top: 0;" title="Ingresa el ciclo. Ej: 202610 (Calendario A), 202620 (Calendario B)">
+                    <input type="text" id="apiCiclo" value="202620" placeholder="Ciclo (Ej: 202610)" title="Ingresa el ciclo. Ej: 202610 (Calendario A), 202620 (Calendario B)">
                     
                     <!-- 2. Todos los Centros Universitarios de la Red UdeG -->
-                    <select id="apiCentro" style="flex: 1; margin-top: 0;">
+                    <select id="apiCentro" >
                         <option value="D">CUCEI (D)</option>
                         <option value="C">CUCEA (C)</option>
                         <option value="E">CUCS (E)</option>
@@ -198,9 +198,9 @@
                     </select>
                     
                     <!-- 3. Carrera Libre -->
-                    <input type="text" id="apiCarrera" value="" placeholder="Carrera (Ej: INCO, INQU)" style="flex: 1; margin-top: 0;">
+                    <input type="text" id="apiCarrera" value="" placeholder="Carrera">
                     
-                    <button class="btn-submit" onclick="descargarOfertaAPI()" style="min-width: 120px;">Extraer del SIIAU</button>
+                    <button class="btn-submit" onclick="descargarOfertaAPI()">Extraer Oferta</button>
                 </div>
                 
                 <div id="estadoOferta" style="font-size: 13px; margin-top: 12px; color: #30D158; font-weight: 600;"></div>
@@ -261,7 +261,7 @@
                         <label style="font-size:12px;">Turno Deseado:</label>
                         <select id="selTurnoGlobal" style="margin-top:5px;">
                             <option value="matutino">Matutino (07:00 a 14:55)</option>
-                            <option value="vespertino">Vespertino (14:00 a 20:55)</option>
+                            <option value="vespertino">Vespertino (13:00 a 20:55)</option>
                             <option value="mixto">Mixto (Cualquier horario)</option>
                         </select>
                     </div>
@@ -273,8 +273,8 @@
                     </div>
                 </div>
             </div>
-            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--glass-border);">
-                        <label style="color:#30D158; font-weight:bold; font-size:13px;">Cupos en Vivo (SIIAU):</label>
+            <!--<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--glass-border);">
+                       <label style="color:#30D158; font-weight:bold; font-size:13px;">Cupos en Vivo (SIIAU):</label> 
                         
                         <label style="display:flex; align-items:center; gap:8px; margin-top:8px; cursor:pointer;">
                             <input type="checkbox" id="chkCuposEnVivo" onchange="document.getElementById('cajaMinCupos').style.display = this.checked ? 'flex' : 'none';">
@@ -292,7 +292,7 @@
             <div id="resultadosGenerador" style="margin-top:35px; display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:25px;"></div>
             <div id="contenedorCargarMas" style="text-align: center; margin-top: 20px; display: none;">
                 <button class="btn-submit" style="background: rgba(10, 132, 255, 0.2) !important; color: #64D2FF !important; border: 1px solid rgba(10, 132, 255, 0.4); max-width: 200px; display: inline-flex; justify-content: center;" onclick="mostrarMasResultados()">Cargar más opciones</button>
-            </div>
+            </div>-->
         </div>
             
 
