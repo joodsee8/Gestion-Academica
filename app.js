@@ -857,7 +857,7 @@ function respetaRestricciones(curso, prefs) {
         let ini = convertirHoraAMinutos(h.inicio); let fin = convertirHoraAMinutos(h.fin);
         if(prefs.type === 'global') {
             if(prefs.turno === 'matutino' && fin > 895) return false;
-            if(prefs.turno === 'vespertino' && ini < 840) return false;
+            if(prefs.turno === 'vespertino' && ini < 750) return false;
         } else {
             let restDia = prefs.limites[h.dia];
             if(!restDia || restDia === 'descanso') return false; 
